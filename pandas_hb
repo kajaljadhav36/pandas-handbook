@@ -1,0 +1,304 @@
+Index
+
+Reading files
+checking null
+loc() , iloc()
+making dataframe
+missing data handling
+iteration
+isin
+changing datatype
+groupby
+concat
+daterange
+rank
+replace
+between
+sample
+starswith
+endswith
+split
+get()
+upper, lower
+len
+reading multiple zip files from folder using pandas
+lambda function
+join
+pandas for json normalization
+melt
+crosstab
+cut
+rolling
+
+
+**Reading files
+
+df = pd.read_csv("sonar data.csv")
+#df = pd.read_csv("filename.csv", sep = ' ;')
+
+
+**checking null
+
+df.isna().sum()
+
+
+**loc() , iloc()
+
+loc[] : loc[] retrieves rows based on index label
+iloc[] : iloc[] retrieves rows based on index position
+#loc attribute access a group of rows and columns by labels
+
+df.loc[:, ["0.0428", "0.0032"]]
+df.iloc[1:3, 0:3]
+
+
+***making dataframe
+
+lst = {'firstname' : ['kajal', 'hrutuja', 'bharti'], 'lastnmae': ['jadhav', 'baikar', 'choudhary'], 'Age':[21, 22, 22]}
+df = pd.DataFrame(lst)
+df
+df.loc[df.Age == 22, "Can drink"] = 'Yes' 
+df
+
+
+***missing data handling
+
+df.fillna('no')
+df.dropna()
+df.notnull()
+
+
+iteration
+
+for i , j in df.iterrows():
+  print(i, j)
+  
+  
+isin
+
+new = df["Age"].isin([22])
+new
+new = df["Age"].isin([22, 21])
+new
+
+
+changing datatype
+
+df.Age.astype('int64', 'float', 'string')
+pd.to_datetime()
+
+
+groupby
+
+df.groupby('Age').count()
+df.groupby('Age').groups
+
+grp = df.groupby('Age')
+for age, group in grp:
+    #print(age)
+    print(group)
+    print()
+    
+    
+concat
+
+#concatinating two df ... but removing column names of df1 
+res = pd.concat([df, df1], ignore_index=True)
+#taking only common things present in two dfs
+res2 = pd.concat([df, df1], axis=1, join='inner')
+# using .merge() function... key could be any column you want to join on 
+res = pd.merge(df, df1, on='key')
+#left join
+res = pd.merge(df, df1, how='left', on=['key', 'key1'])
+
+
+daterange
+
+#Working with date and time using Pandas
+data = pd.date_range('1/1/2011', periods = 10, freq ='D')
+data = pd.to_datetime('col_name') # for the column which is not in datetime format
+
+
+rank
+
+df["Rank"] = df["firstname"].rank()
+df
+df.drop("col_name")
+#sort
+df.sort_values("firstname", inplace = True)
+df
+
+
+replace
+
+df.firstname =[firstname.replace("a", "_") for firstname in df.firstname]
+df
+#query
+df.query('lastnmae == "jadhav"', inplace = True)
+df
+
+
+between
+a = (df['Age'] >= 20) & (df['Age'] < 22)
+a
+
+
+sample
+
+a = df.sample(n = 1) 
+a
+#if 
+
+if (0.25*(len(df))== 1.2):
+    print( "Cool")
+else:
+  print("not cool")
+
+starswith
+
+txt = "welcome to pandas handbook"
+
+x = txt.startswith("wel")
+y = txt.startswith("to", 8, 12)
+print(x)
+print(y)
+
+x = df["firstname"].str.startswith("k")
+x
+
+
+endswith
+
+txt = "welcome to pandas handbook"
+
+x = txt.endswith("book")
+y = txt.endswith("come", 3, 7)
+print(x)
+print(y)
+
+
+split
+
+lst = {'firstname' : ['kajal_jadhav', 'hrutuja_baikar', 'bharti_choudhary'], 'Age':[21, 22, 22]}
+df = pd.DataFrame(lst)
+df1= df["firstname"].str.split("_", n = 1, expand = True)  #n=1 will make change only once in every string and expand =false will keep same df instead of making new 
+
+get()
+
+print(df.get("firstname"))
+
+
+upper, lower
+
+df['firstname'] = df['firstname'].str.upper()
+df['firstname'] = df['firstname'].str.lower()
+
+
+len
+
+df[df['firstname'].str.len() > 14]
+df['firstname'].str.len()
+
+
+reading multiple zip files from folder using pandas
+
+import os,os.path
+import glob
+os.chdir(r'C:\Users\kajal\Documents\MCR')
+os.listdir()
+glob.glob('*.{}'.format('csv'))
+
+import zipfile
+zf = zipfile.ZipFile('file_name')
+c =zf.namelist()
+pd.read_csv(zf.open(f) for f in c )
+
+
+lambda function
+
+df.groupby('a').agg({'b': 'sum', 'c': lambda x: ' '.join(x)})
+
+
+join
+
+df.join(other_df, on= ['col1','col2'], how = outer, sort)
+
+
+pandas for json normalization
+
+data = '{"employee_name": "James", "email": "james@gmail.com", "job_profile": [{"title1":"Team Lead", "title2":"Sr. Developer"}]}'
+pd.read_json(data,orient = 'records')
+pd.read_json(data,orient = 'index')
+pd.read_json(data,orient = 'columns')
+df1.to_json(orient= 'index')
+df1.to_json(orient= 'columns')
+df1.to_json(orient= 'records')
+df1.to_json(orient= 'table')
+data4 = '{"schema":{"fields":[{"name":"index","type":"string"},{"name":"name","type":"string"},{"name":"id","type":"string"}],
+"primaryKey":["index"],"pandas_version":"0.20.0"},"data":[{"index":"row1","name":"saurabh","id":"50"},{"index":"row2","name":"saurabh","id":"50"}]}'
+pd.read_json(data4,orient = 'table')
+df1.to_json(orient= 'split')
+data1 = {"employee_name": "James", "email": "james@gmail.com", "job_profile": {"title1":"Team Lead", "title2":"Sr. Developer"}}
+pd.json_normalize(data1,max_level = 0)
+data3 = [
+    {
+        "state": "Florida",
+        "shortname": "FL",
+        "info": [{"governor": "Rick Scott"}],
+        "counties": [
+            {"name": "Dade", "population": 12345},
+            {"name": "Broward", "population": 40000},
+            {"name": "Palm Beach", "population": 60000},
+        ],
+    },
+    {
+        "state": "Ohio",
+        "shortname": "OH",
+        "info": [{"governor": "John Kasich"}],
+        "counties": [
+            {"name": "Summit", "population": 1234},
+            {"name": "Cuyahoga", "population": 1337},
+        ],
+    },
+]
+df= pd.json_normalize(data3,record_path =['counties'],meta = ['state'])
+
+
+melt
+
+#Melt functions creates a long form of a table instead of a wide table. It is similar to unpivot which creates a row for each column value.
+
+Df.melt(id_vars = ['column_name'], value_vars = ['column_name1'])
+
+Df.melt(id_vars = ['column_name'], value_vars = ['column_name1','column_name2'])
+
+
+crosstab
+
+#This method is used to compute a simple cross-tabulation of two (or more) factors.It is similar to simple pivot.
+#First instance is rows and second is column.uses count can be changes
+
+ Pd.crosstab(df['column_name'],df['column_name'])
+ 
+ 
+cut
+
+#Pandas cut() function is used to separate the array elements into different bins . The cut function is mainly used to perform statistical analysis on scalar data. 
+
+ 
+Df['new_column_name'] = Pd.cut(df['numerical_column_name'],bins = [1,10,20,30,40])
+
+Df['new_column_name'] = Pd.cut(df['numerical_column_name'],bins = [1,10,20,30,40], labels = ['1 to 10','11 to 20','21 to 30',])
+
+
+rolling
+
+#Df.rolling is used to calculate rolling aggregate over a window
+
+Df['new_column_name'] = df['numerical_column_name'].rolling(window = 3).sum()
+
+
+#if you want to make a dict of multiple zip csv file name as a key and any column as a value, in my example im considering date column for value
+d = {}
+for i, v in enumerate(c):
+  d[v] = pd.to_datetime(pd.read_cvs(zf.open(c[i]), usecols= ["coumnname lets consider date column"]) , errors = 'coerce'.dt.date) 
